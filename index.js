@@ -1,6 +1,8 @@
 const express = require("express");
 const webpush = require("web-push");
 const bodyParser = require("body-parser");
+const https = require("https");
+const fs = require("fs");
 const path = require("path");
 const app = express();
 app.use(bodyParser.json());
@@ -18,4 +20,12 @@ app.post("/subscribe", (req, res) => {
     .sendNotification(subscription, payload)
     .catch(err => console.log(err));
 });
-app.listen(80, () => console.log("server running"));
+https
+  .createServer(
+    {
+      key: fs.readFileSync("./fullchain.pem"),
+      cert: fs.readFileSync("./cert.pem")
+    },
+    app
+  )
+  .listen(443);
